@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.library.narrator.tts.TTSBuilder;
 
 public class NarratorView extends FrameLayout implements Narrator.NarrationListener {
 
@@ -88,6 +89,13 @@ public class NarratorView extends FrameLayout implements Narrator.NarrationListe
             narrator.unRegisterNarrationListener(this);
             narrator = null;
         }
+    }
+
+    public void attachContentViewAndDisplay(ViewGroup contentView) {
+        this.contentView = contentView;
+        this.textToSpeech = new TTSBuilder(contentView.getContext()).build();
+        narrator = new Narrator(contentView, textToSpeech);
+        narrator.registerNarrationListener(this);
     }
 
     public void attachContentViewAndDisplay(ViewGroup contentView, TextToSpeech textToSpeech) {
