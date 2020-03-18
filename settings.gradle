@@ -1,0 +1,3 @@
+rootProject.name='NarratorAppSample'
+include ':app'
+include ':narrator'

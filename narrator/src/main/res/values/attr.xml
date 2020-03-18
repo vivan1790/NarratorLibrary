@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="NarratorView">
+        <attr name="orientation" format="enum">
+            <enum name="horizontal" value="0"/>
+            <enum name="vertical" value="1"/>
+        </attr>
+        <attr name="color_play_pause_button" format="color"/>
+        <attr name="color_speak_stop_button" format="color"/>
+    </declare-styleable>
+</resources>
