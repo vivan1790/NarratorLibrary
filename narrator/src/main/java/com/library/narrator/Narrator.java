@@ -94,7 +94,6 @@ public class Narrator {
                         narrationListener.onNarrationCompleted();
                     }
                     reset();
-                    narratorView.reset();
                 }
             }
 
@@ -121,6 +120,7 @@ public class Narrator {
         numberOfNarrativeViews = 0;
         indexOfCurrentNarrativeView = 0;
         indexOfLastNarrativeView = -1;
+        narratorView.reset();
     }
 
     public void startNarration() {
