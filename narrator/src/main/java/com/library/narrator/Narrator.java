@@ -2,39 +2,62 @@ package com.library.narrator;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.os.Handler;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Locale;
 
-class Narrator {
+public class Narrator {
 
-    public interface NarrationListener {
-        void onNarrationStarted();
-        void onNarrationPaused();
-        void onNarrationStopped();
-        void onNarrationCompleted();
-    }
-
-    private ViewGroup contentView;
+    private ViewGroup readableContentView;
+    private NarratorView narratorView;
     private TextToSpeech textToSpeech;
     private ArrayList<View> narrativeViews;
     private Handler handler;
     private int numberOfNarrativeViews = 0, indexOfCurrentNarrativeView = 0,
             indexOfLastNarrativeView = -1;
+    private NarrationListener narrationListener;
 
-    private Set<NarrationListener> listeners = new HashSet<>();
-
-    Narrator(final ViewGroup viewGroup, final TextToSpeech tts) {
-        this.contentView = viewGroup;
-        this.textToSpeech = tts;
+    public Narrator(@NonNull final ViewGroup readableContentView,
+                    @NonNull final ViewGroup narrationControlsParent) {
+        this.readableContentView = readableContentView;
+        initTextToSpeech(narrationControlsParent.getContext());
+        narratorView = new NarratorView(narrationControlsParent.getContext(), this);
+        narrationControlsParent.addView(narratorView);
         init();
+    }
+
+    private void initTextToSpeech(Context context) {
+        int pitchValue = 100, speechValue = 100;
+        try {
+            pitchValue = Settings.Secure.getInt(context.getContentResolver(),
+                    Settings.Secure.TTS_DEFAULT_PITCH);
+            speechValue = Settings.Secure.getInt(context.getContentResolver(),
+                    Settings.Secure.TTS_DEFAULT_RATE);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+        final float pitchRate = pitchValue / 100f;
+        final float speechRate = speechValue / 100f;
+        textToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (textToSpeech != null && status != TextToSpeech.ERROR) {
+                    textToSpeech.setLanguage(Locale.getDefault());
+                    textToSpeech.setPitch(pitchRate);
+                    textToSpeech.setSpeechRate(speechRate);
+                }
+            }
+        });
     }
 
     private void init() {
@@ -48,8 +71,8 @@ class Narrator {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                contentView.getParent().requestChildFocus(contentView,
-                                        narrativeViews.get(index));
+                                readableContentView.getParent().requestChildFocus(
+                                        readableContentView, narrativeViews.get(index));
                             }
                         });
                     }
@@ -67,9 +90,11 @@ class Narrator {
                     }
                 }
                 if (indexOfLastNarrativeView == numberOfNarrativeViews - 1 && !isNarrating()) {
-                    for (NarrationListener listener : listeners) {
-                        listener.onNarrationCompleted();
+                    if (narrationListener != null) {
+                        narrationListener.onNarrationCompleted();
                     }
+                    reset();
+                    narratorView.reset();
                 }
             }
 
@@ -91,19 +116,19 @@ class Narrator {
         }
     }
 
-    void reset() {
+    private void reset() {
         narrativeViews.clear();
         numberOfNarrativeViews = 0;
         indexOfCurrentNarrativeView = 0;
         indexOfLastNarrativeView = -1;
     }
 
-    void startNarration() {
+    public void startNarration() {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (indexOfLastNarrativeView == -1) {
-                    obtainNarrativeViews(contentView);
+                    obtainNarrativeViews(readableContentView);
                     if (numberOfNarrativeViews > 0) {
                         animateView(narrativeViews.get(0), 2);
                     }
@@ -124,33 +149,33 @@ class Narrator {
                 }
             }
         }, 500);
-        for (NarrationListener listener : listeners) {
-            listener.onNarrationStarted();
+        if (narrationListener != null) {
+            narrationListener.onNarrationStarted();
         }
     }
 
-    void pauseNarration() {
+    public void pauseNarration() {
         if (textToSpeech.isSpeaking()) {
             textToSpeech.stop();
         }
-        for (NarrationListener listener : listeners) {
-            listener.onNarrationPaused();
+        if (narrationListener != null) {
+            narrationListener.onNarrationPaused();
         }
     }
 
-    void stopNarration() {
+    public void stopNarration() {
         if (textToSpeech.isSpeaking()) {
             textToSpeech.stop();
         }
         indexOfLastNarrativeView = -1;
-        showAllViews(contentView);
-        for (NarrationListener listener : listeners) {
-            listener.onNarrationStopped();
+        showAllViews(readableContentView);
+        if (narrationListener != null) {
+            narrationListener.onNarrationStopped();
         }
         reset();
     }
 
-    boolean isNarrating() {
+    public boolean isNarrating() {
         return textToSpeech.isSpeaking();
     }
 
@@ -159,13 +184,6 @@ class Narrator {
         for (int i = 0; i < numOfChildren; i++) {
             View view = viewGroup.getChildAt(i);
             if (view.getVisibility() == View.VISIBLE) {
-                /*if ((view instanceof ImageView) || (view instanceof TextView)  || (view instanceof View)) {
-                    narrativeViews.add(view);
-                    animateView(view, 1);
-                    numberOfNarrativeViews++;
-                } else if (view instanceof ViewGroup) {
-                    obtainNarrativeViews((ViewGroup) view);
-                }*/
                 if (view instanceof ViewGroup) {
                     obtainNarrativeViews((ViewGroup) view);
                 } else {
@@ -191,8 +209,7 @@ class Narrator {
         }
     }
 
-    private void animateView(View view, int type) {
-        // 1 = fade away, 2 = show up
+    private void animateView(View view, int type) {   // 1 = fade away, 2 = show up
         AnimatorSet anim = new AnimatorSet();
         anim.setDuration(400);
         if (type == 1) {
@@ -203,11 +220,7 @@ class Narrator {
         anim.start();
     }
 
-    void registerNarrationListener(NarrationListener listener) {
-        listeners.add(listener);
-    }
-
-    void unRegisterNarrationListener(NarrationListener listener) {
-        listeners.remove(listener);
+    public void setNarrationListener(NarrationListener narrationListener) {
+        this.narrationListener = narrationListener;
     }
 }

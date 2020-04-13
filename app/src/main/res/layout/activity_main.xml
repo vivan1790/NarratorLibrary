@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
 
     <ScrollView
@@ -39,7 +38,7 @@
                 android:textSize="16dp"
                 android:text="In Java destruction of object from memory is done automatically by the JVM. When there is no reference to an object, then that object is assumed to be no longer needed and the memory occupied by the object are released. This technique is called Garbage Collection. This is accomplished by the JVM."/>
 
-            <TextView
+            <!--<TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/black"
@@ -122,23 +121,18 @@
                 android:padding="16dp"
                 android:textSize="16dp"
                 android:text="No, the Garbage Collection can not be forced explicitly. We may request JVM for garbage collection by calling System.gc() method. But This does not guarantee that JVM will perform the garbage collection."/>
-
-
-
+            -->
         </LinearLayout>
 
     </ScrollView>
 
-    <com.library.narrator.NarratorView
-        android:id="@+id/narrator_view"
+    <FrameLayout
+        android:id="@+id/narrator_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="30dp"
-        android:layout_marginEnd="30dp"
-        app:orientation="vertical"
-        app:color_play_pause_button="@android:color/holo_blue_dark"
-        app:color_speak_stop_button="@android:color/holo_orange_dark"/>
+        android:layout_marginEnd="30dp"/>
 
 </RelativeLayout>

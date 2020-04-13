@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
-    android:background="@android:color/transparent"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:animateLayoutChanges="true">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_play_pause"
+        android:id="@+id/button_play_pause"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:padding="20dp"
@@ -17,11 +16,12 @@
         app:borderWidth="0dp"
         app:fabSize="normal"
         android:layout_margin="10dp"
-        android:alpha="0"
-        android:src="@drawable/icon_pause"/>
+        android:alpha="0.8"
+        android:src="@drawable/icon_pause"
+        android:visibility="gone"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_speak_stop"
+        android:id="@+id/button_start_stop"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:padding="22dp"
