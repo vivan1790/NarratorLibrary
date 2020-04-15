@@ -22,4 +22,10 @@ public class MainActivity extends AppCompatActivity {
         narratorContainer = findViewById(R.id.narrator_container);
         narrator = new Narrator(contentView, narratorContainer);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        narrator.finish();
+    }
 }

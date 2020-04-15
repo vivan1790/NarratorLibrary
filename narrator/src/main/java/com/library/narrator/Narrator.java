@@ -36,6 +36,13 @@ public class Narrator {
         init();
     }
 
+    public void finish() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+    }
+
     private void initTextToSpeech(Context context) {
         int pitchValue = 100, speechValue = 100;
         try {
