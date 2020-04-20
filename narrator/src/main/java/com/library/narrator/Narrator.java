@@ -27,6 +27,7 @@ public class Narrator {
             indexOfLastNarrativeView = -1;
     private NarrationListener narrationListener;
     private boolean isNarrationPaused = false;
+    private String imageDescription;
 
     public Narrator(@NonNull final ViewGroup readableContentView,
                     @NonNull final ViewGroup narrationControlsParent) {
@@ -42,6 +43,10 @@ public class Narrator {
             textToSpeech.stop();
             textToSpeech.shutdown();
         }
+    }
+
+    public void setImageDescription(String imageDescription) {
+        this.imageDescription = imageDescription;
     }
 
     private void initTextToSpeech(Context context) {
@@ -118,6 +123,9 @@ public class Narrator {
         if (view instanceof TextView) {
             return ((TextView) view).getText().toString();
         } else {
+            if (imageDescription != null) {
+                return imageDescription;
+            }
             return (view.getContentDescription() == null) ?
                     "" : view.getContentDescription().toString();
         }
