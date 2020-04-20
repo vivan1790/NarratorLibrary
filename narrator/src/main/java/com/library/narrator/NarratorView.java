@@ -45,7 +45,7 @@ class NarratorView extends FrameLayout {
         buttonStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (narrator.isNarrating()) {
+                if (narrator.isNarrating() || narrator.isNarrationPaused()) {
                     narrator.stopNarration();
                     buttonStartStop.setImageResource(R.drawable.icon_speaker_white);
                     buttonPlayPause.setVisibility(View.GONE);

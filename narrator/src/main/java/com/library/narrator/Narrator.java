@@ -26,6 +26,7 @@ public class Narrator {
     private int numberOfNarrativeViews = 0, indexOfCurrentNarrativeView = 0,
             indexOfLastNarrativeView = -1;
     private NarrationListener narrationListener;
+    private boolean isNarrationPaused = false;
 
     public Narrator(@NonNull final ViewGroup readableContentView,
                     @NonNull final ViewGroup narrationControlsParent) {
@@ -156,6 +157,7 @@ public class Narrator {
                 }
             }
         }, 500);
+        isNarrationPaused = false;
         if (narrationListener != null) {
             narrationListener.onNarrationStarted();
         }
@@ -165,6 +167,7 @@ public class Narrator {
         if (textToSpeech.isSpeaking()) {
             textToSpeech.stop();
         }
+        isNarrationPaused = true;
         if (narrationListener != null) {
             narrationListener.onNarrationPaused();
         }
@@ -176,6 +179,7 @@ public class Narrator {
         }
         indexOfLastNarrativeView = -1;
         showAllViews(readableContentView);
+        isNarrationPaused = false;
         if (narrationListener != null) {
             narrationListener.onNarrationStopped();
         }
@@ -184,6 +188,10 @@ public class Narrator {
 
     public boolean isNarrating() {
         return textToSpeech.isSpeaking();
+    }
+
+    boolean isNarrationPaused() {
+        return isNarrationPaused;
     }
 
     private void obtainNarrativeViews(ViewGroup viewGroup) {
