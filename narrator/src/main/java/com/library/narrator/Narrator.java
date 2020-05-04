@@ -81,13 +81,8 @@ public class Narrator {
                     indexOfLastNarrativeView = Integer.parseInt(utterance_id.substring(1));
                     if (utterance_id.charAt(0) == 'U') {
                         final int index = Integer.parseInt(utterance_id.substring(1));
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                readableContentView.getParent().requestChildFocus(
-                                        readableContentView, narrativeViews.get(index));
-                            }
-                        });
+                        readableContentView.getParent().requestChildFocus(
+                                readableContentView, narrativeViews.get(index));
                     }
                 }
             }
